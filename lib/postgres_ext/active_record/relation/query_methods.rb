@@ -201,14 +201,15 @@ module ActiveRecord
       self
     end
 
-    def build_arel_with_extensions
-      arel = build_arel_without_extensions
+    prepend Module.new do 
+      def build_arel(foo)
+        arel = super foo
+        build_with(arel)
 
-      build_with(arel)
+        build_rank(arel, rank_value) if rank_value
 
-      build_rank(arel, rank_value) if rank_value
-
-      arel
+        arel
+      end
     end
 
     def build_with(arel)
@@ -266,7 +267,5 @@ module ActiveRecord
         end
       end
     end
-
-    alias_method_chain :build_arel, :extensions
   end
 end
